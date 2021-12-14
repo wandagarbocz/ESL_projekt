@@ -1,1 +1,1 @@
-# ESL_tutoriale
+Projekt z przedmiotu ESL - Sequencer
