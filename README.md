@@ -1,1 +1,1 @@
-Projekt z przedmiotu ESL - Sequencer
+Projekt z przedmiotu ESL - Sequencer muzyczny
