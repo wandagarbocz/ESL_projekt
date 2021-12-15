@@ -1,4 +1,4 @@
-from myhdl import always_seq, enum, modbv, block, Signal
+from myhdl import always_seq, enum, intbv, block, Signal
 
 ACTIVE_HIGH = 1
 
@@ -6,12 +6,12 @@ ACTIVE_HIGH = 1
 def sequencer(gain, shutdown, reset, clk, ceo, start):
     t_state = enum('A_5', 'Fis_5', 'G_5', 'A_4', 'B_4', 'Cis_5', 'D_5', 'E_5')
     state = Signal(t_state.A_5)
-    sounds = [11, 13, 12, 22, 19, 18, 17, 15]
-    sounds_divider = [Signal(modbv(1, min=0, max=sounds[i])) for i in range(len(sounds))]
-    length = [46, 19, 21, 11, 13, 14, 15, 17, 23]
-    length_divider = [Signal(modbv(1, min=0, max=length[i])) for i in range(len(length))]
-    ceo_sig = Signal(0)
-    iteration = Signal(modbv(0, min=0, max=3))
+    sounds = [11, 11, 11, 11, 11, 11, 11, 11]#[11, 13, 12, 22, 19, 18, 17, 15]
+    sounds_divider = [Signal(intbv(1, min=0, max=sounds[i])) for i in range(len(sounds))]
+    length = [19, 19, 19, 19, 19, 19, 19, 19, 19]#[46, 19, 21, 11, 13, 14, 15, 17, 23]
+    length_divider = [Signal(intbv(1, min=0, max=length[i])) for i in range(len(length))]
+    ceo_sig = Signal(bool(0))
+    iteration = Signal(intbv(0, min=0, max=3))
 
     def func(sounds_divider1, ceo_sig1, length_divider1, state1, t_state1):
         if sounds_divider1 == 0:
@@ -28,12 +28,12 @@ def sequencer(gain, shutdown, reset, clk, ceo, start):
         shutdown.next = 1
         if reset == ACTIVE_HIGH:
             state.next = t_state.A_5
-            sounds_divider.next = [1 for i in range(len(sounds_divider))]
+            sounds_divider.next = Signal(intbv(1)[len(sounds_divider):])# for i in range(len(sounds_divider))]
             ceo_sig.next = 0
             iteration.next = 0
-            length_divider.next = [1 for i in range(len(length_divider))]
+            length_divider.next = Signal(intbv(1)[len(length_divider):])#[1 for i in range(len(length_divider))]
         else:
-            if start == 1:
+            if start == ACTIVE_HIGH:
                 if state == t_state.A_5:
                     if sounds_divider[0] == 0:
                         if ceo_sig == 1:
@@ -65,5 +65,3 @@ def sequencer(gain, shutdown, reset, clk, ceo, start):
                     func(sounds_divider[7], ceo_sig, length_divider[7], state, t_state.Fis_5)
         ceo.next = ceo_sig
     return seq_logic
-
-
