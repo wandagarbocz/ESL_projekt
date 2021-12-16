@@ -6,13 +6,12 @@ ACTIVE_HIGH = 1
 def sequencer(gain, shutdown, reset, clk, ceo, start):
     t_state = enum('A_5', 'Fis_5', 'G_5', 'A_4', 'B_4', 'Cis_5', 'D_5', 'E_5')
     state = Signal(t_state.A_5)
-    sounds = [33, 43, 38, 64, 60, 57, 53, 48]#[11, 13, 12, 22, 19, 18, 17, 15]
-    sounds_divider = [Signal(modbv(1, min=0, max=sounds[i])[7:]) for i in range(len(sounds))]
-    length = [31, 17, 17, 17, 17, 17, 17, 17, 17]#[46, 19, 21, 11, 13, 14, 15, 17, 23]
-    length_divider = [Signal(modbv(1, min=0, max=length[i])[5:]) for i in range(len(length))]
+    sounds = [33, 43, 38, 64, 60, 57, 53, 48]
+    sounds_divider = [Signal(modbv(1, min=0, max=sounds[i])) for i in range(len(sounds))]
+    length = [31, 17, 17, 17, 17, 17, 17, 17, 17]
+    length_divider = [Signal(modbv(1, min=0, max=length[i])) for i in range(len(length))]
     ceo_sig = Signal(bool(0))
-    #iteration = Signal(modbv(13, min=13, max=16))
-    iteration = Signal(modbv(0, min=0, max=2)[2:])
+    iteration = Signal(intbv(0, min=0, max=3)[2:])
 
 
     @always_seq(clk.posedge, reset=reset)
@@ -22,11 +21,11 @@ def sequencer(gain, shutdown, reset, clk, ceo, start):
         if reset == ACTIVE_HIGH:
             state.next = t_state.A_5
             for i in range(len(sounds_divider)):
-                sounds_divider[i].next = 1#Signal(intbv(1)[len(sounds_divider):])# for i in range(len(sounds_divider))]
+                sounds_divider[i].next = 1
             ceo_sig.next = 0
             iteration.next = 0
             for i in range(len(length_divider)):
-                length_divider[i].next = 1#Signal(intbv(1)[len(length_divider):])#[1 for i in range(len(length_divider))]
+                length_divider[i].next = 1
         else:
             if start == ACTIVE_HIGH:
                 if state == t_state.A_5:
