@@ -11,7 +11,8 @@ def sequencer(gain, shutdown, reset, clk, ceo, start):
     length = [31, 17, 17, 17, 17, 17, 17, 17, 17]#[46, 19, 21, 11, 13, 14, 15, 17, 23]
     length_divider = [Signal(modbv(1, min=0, max=length[i])) for i in range(len(length))]
     ceo_sig = Signal(bool(0))
-    iteration = Signal(modbv(0, min=0, max=3))
+    #iteration = Signal(modbv(13, min=13, max=16))
+    iteration = Signal(modbv(0)[2:])
 
     def func(sounds_divider1, ceo_sig1, length_divider1, state1, t_state1):
         if sounds_divider1 == 0:
@@ -31,7 +32,7 @@ def sequencer(gain, shutdown, reset, clk, ceo, start):
             for i in range(len(sounds_divider)):
                 sounds_divider[i].next = 1#Signal(intbv(1)[len(sounds_divider):])# for i in range(len(sounds_divider))]
             ceo_sig.next = 0
-            iteration[len(iteration):].next = 0
+            iteration.next = 0
             for i in range(len(length_divider)):
                 length_divider[i].next = 1#Signal(intbv(1)[len(length_divider):])#[1 for i in range(len(length_divider))]
         else:
@@ -42,12 +43,12 @@ def sequencer(gain, shutdown, reset, clk, ceo, start):
                             if iteration < 2:
                                 if length_divider[0] == 0:
                                     state.next = t_state.Fis_5
-                                    iteration[(len(iteration)):].next = iteration + 1
+                                    iteration.next = iteration + 1
                                 length_divider[0].next = length_divider[0] + 1
                             else:
                                 if length_divider[8] == 0:
                                     state.next = t_state.A_4
-                                    iteration[len(iteration):].next = iteration + 1
+                                    iteration.next = iteration + 1
                                 length_divider[8].next = length_divider[8] + 1
                         ceo_sig.next = not ceo_sig
                     sounds_divider[0].next = sounds_divider[0] + 1
