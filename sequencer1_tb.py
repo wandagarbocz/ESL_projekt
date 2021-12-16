@@ -1,5 +1,5 @@
 from myhdl import block, always, instance, Signal, ResetSignal, delay, StopSimulation
-from sequencer1 import sequencer
+from sequencer2 import sequencer
 
 
 @block
@@ -12,6 +12,8 @@ def testbench():
     start = Signal(bool(1))
 
     seq1 = sequencer(gain, shutdown, reset, clk, ceo, start)
+    seq1.convert(hdl='vhdl')
+
 
     HALF_PERIOD = delay(1)
 
@@ -21,14 +23,14 @@ def testbench():
 
     @instance
     def stimulus():
-        for i in range(10):
-            yield delay(40073)
+        for i in range(2):
+            yield delay(1000073)
             reset.next = 1
-            yield delay(20)
-            reset.next = 0
-            yield delay(100)
+            yield delay(2000)
+            reset.next = not reset
+            yield delay(20000)
             start.next = 0
-            yield delay(200)
+            yield delay(70000)
             start.next = 1
         raise StopSimulation()
 
